@@ -233,6 +233,8 @@
 
   /* explosion wrap */
   .product-img-wrap { flex: 0 0 auto; width: clamp(220px, 28vw, 400px); position: relative; }
+  /* bowl assembly rendered 1.5x larger */
+  #redWrap, #goldWrap { width: clamp(330px, 42vw, 600px); }
   .product-img-wrap::before {
     content: ''; position: absolute; inset: -20%; border-radius: 50%; opacity: 0.28; filter: blur(60px);
   }
@@ -248,7 +250,7 @@
     object-fit: contain; will-change: transform, opacity; opacity: 0;
   }
   .bowl-layer[data-layer="base"] { filter: drop-shadow(0 24px 50px rgba(0,0,0,0.85)); }
-  .bowl-steam { mix-blend-mode: screen; }
+  .bowl-steam { mix-blend-mode: screen; filter: blur(4px); }
 
   /* ── BACKGROUND DECO FRAGMENTS ── */
   .frag {
@@ -456,7 +458,14 @@
   <div class="frag frag-noodle" id="rf6" style="top:2%;right:20%;transform:rotate(-10deg)"><img src="noodle.svg"></div>
   <div class="product-inner">
     <div class="product-img-wrap" id="redWrap">
-      <img src="chicken-cutout.png" alt="香辣雞寬帶麵" id="redImg">
+      <div class="bowl-stage" id="redBowl">
+        <img class="bowl-layer" data-layer="base"    src="bowl-red/base.png"    alt="香辣雞寬帶麵">
+        <img class="bowl-layer" data-layer="noodle"  src="bowl-red/noodle.png"  alt="">
+        <img class="bowl-layer" data-layer="chicken" src="bowl-red/chicken.png" alt="">
+        <img class="bowl-layer" data-layer="pepper"  src="bowl-red/pepper.png"  alt="">
+        <img class="bowl-layer" data-layer="onion"   src="bowl-red/onion.png"   alt="">
+        <img class="bowl-layer bowl-steam" data-layer="steam" src="bowl-red/steam.png" alt="">
+      </div>
     </div>
     <div class="product-info">
       <div class="product-tag reveal">限定口味</div>
@@ -493,7 +502,16 @@
   <div class="frag frag-noodle" id="gf6" style="top:3%;left:22%;transform:rotate(8deg)"><img src="noodle2.svg"></div>
   <div class="product-inner">
     <div class="product-img-wrap" id="goldWrap">
-      <img src="beef-cutout-reverse.png" alt="酸菜麻辣牛肉寬帶麵" id="goldImg">
+      <div class="bowl-stage" id="goldBowl">
+        <img class="bowl-layer" data-layer="base"    src="bowl-gold/base.png"    alt="酸菜麻辣牛肉寬帶麵">
+        <img class="bowl-layer" data-layer="noodle"  src="bowl-gold/noodle.png"  alt="">
+        <img class="bowl-layer" data-layer="broth"   src="bowl-gold/broth.png"   alt="">
+        <img class="bowl-layer" data-layer="beef"    src="bowl-gold/beef.png"    alt="">
+        <img class="bowl-layer" data-layer="mustard" src="bowl-gold/mustard.png" alt="">
+        <img class="bowl-layer" data-layer="chili"   src="bowl-gold/chili.png"   alt="">
+        <img class="bowl-layer" data-layer="onion"   src="bowl-gold/onion.png"   alt="">
+        <img class="bowl-layer bowl-steam" data-layer="steam" src="bowl-gold/steam.png" alt="">
+      </div>
     </div>
     <div class="product-info">
       <div class="product-tag reveal">明星商品</div>
@@ -671,7 +689,7 @@ document.querySelectorAll('.reveal').forEach((el, i) => {
 });
 
 // ── 3D TILT ──
-['redImg', 'goldImg'].forEach(id => {
+['redBowl', 'goldBowl'].forEach(id => {
   const el = document.getElementById(id);
   if (!el) return;
   const sec = el.closest('.product-section');
@@ -686,35 +704,39 @@ document.querySelectorAll('.reveal').forEach((el, i) => {
 function buildBowl(stageId) {
   const stage = document.getElementById(stageId);
   if (!stage) return;
-  const L = sel => stage.querySelector(`[data-layer="${sel}"]`);
-  const base = L('base'), noodle = L('noodle'), chicken = L('chicken'),
-        pepper = L('pepper'), onion = L('onion'), steam = L('steam');
+  const all = [...stage.querySelectorAll('.bowl-layer')];
+  const base  = stage.querySelector('[data-layer="base"]');
+  const steam = stage.querySelector('.bowl-steam');
+  // toppings = everything between base and steam, in DOM order
+  const toppings = all.filter(l => l !== base && l !== steam);
 
-  gsap.set([base, noodle, chicken, pepper, onion, steam], { opacity: 0 });
+  gsap.set(all, { opacity: 0 });
 
-  const tl = gsap.timeline({
-    scrollTrigger: { trigger: stage, start: 'top 75%' }
+  const tl = gsap.timeline({ paused: true });
+  // bowl pops in
+  tl.fromTo(base, { opacity: 0, scale: 0.85, y: 30 },
+                  { opacity: 1, scale: 1, y: 0, duration: 0.6, ease: 'back.out(1.5)' });
+  // each topping drops in from above, alternating a little spin
+  toppings.forEach((layer, i) => {
+    const spin = i % 2 ? 12 : -12;
+    tl.fromTo(layer, { opacity: 0, y: -90 - i * 8, scale: 1.12, rotate: spin },
+                     { opacity: 1, y: 0, scale: 1, rotate: 0, duration: 0.45, ease: 'power3.out' },
+              i === 0 ? '-=0.1' : '-=0.28');
   });
-  tl.fromTo(base,    { opacity: 0, scale: 0.85, y: 30 },
-                     { opacity: 1, scale: 1, y: 0, duration: 0.6, ease: 'back.out(1.5)' })
-    .fromTo(noodle,  { opacity: 0, y: -90, scale: 1.1 },
-                     { opacity: 1, y: 0, scale: 1, duration: 0.5, ease: 'power3.out' }, '-=0.1')
-    .fromTo(chicken, { opacity: 0, y: -120, scale: 1.15 },
-                     { opacity: 1, y: 0, scale: 1, duration: 0.5, ease: 'power3.out' }, '-=0.2')
-    .fromTo(pepper,  { opacity: 0, y: -80, scale: 1.3, rotate: -15 },
-                     { opacity: 1, y: 0, scale: 1, rotate: 0, duration: 0.45, ease: 'power2.out' }, '-=0.25')
-    .fromTo(onion,   { opacity: 0, y: -80, scale: 1.3, rotate: 12 },
-                     { opacity: 1, y: 0, scale: 1, rotate: 0, duration: 0.45, ease: 'power2.out' }, '-=0.3')
-    .fromTo(steam,   { opacity: 0, y: 30, scale: 0.8 },
-                     { opacity: 0.75, y: 0, scale: 1, duration: 0.8, ease: 'power1.out' }, '-=0.1');
+  // steam rises last
+  tl.fromTo(steam, { opacity: 0, y: 40, scale: 0.7 },
+                   { opacity: 0.4, y: 0, scale: 1, duration: 1.0, ease: 'power1.out' }, '-=0.1');
 
   // gentle continuous loops once assembled
   tl.add(() => {
-    gsap.to(base.parentNode, { y: -10, duration: 3.5, ease: 'sine.inOut', yoyo: true, repeat: -1 });
-    gsap.to(steam, { y: -22, opacity: 0.45, duration: 2.8, ease: 'sine.inOut', yoyo: true, repeat: -1 });
+    gsap.to(stage, { y: -10, duration: 3.5, ease: 'sine.inOut', yoyo: true, repeat: -1 });
+    gsap.to(steam, { y: -28, opacity: 0.18, scale: 1.12, duration: 3.2, ease: 'sine.inOut', yoyo: true, repeat: -1 });
   });
+
+  ScrollTrigger.create({ trigger: stage, start: 'top 75%', once: true, onEnter: () => tl.play() });
 }
-// buildBowl('redBowl');  // 碗組裝動畫（暫停，保留供之後啟用）
+buildBowl('redBowl');   // 香辣雞寬帶麵 碗組裝動畫
+buildBowl('goldBowl');  // 酸菜麻辣牛肉寬帶麵 碗組裝動畫
 
 // ── CHILIS ──
 ['redChilis', 'goldChilis'].forEach(id => {
