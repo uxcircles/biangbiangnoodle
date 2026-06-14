@@ -1,0 +1,775 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>漢典食品 · BiangBiang 麵</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lxgw-wenkai-webfont@1.7.0/style.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --red: #7a1c1c;
+    --red-light: #c0392b;
+    --gold: #c17f24;
+    --gold-light: #e8a030;
+    --dark: #0d0d0d;
+    --font-cn-brush: 'LXGW WenKai', 'Noto Serif TC', serif;
+    --font-cn-serif: 'LXGW WenKai', 'Noto Serif TC', serif;
+    --font-en: 'Georgia', serif;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--dark);
+    color: white;
+    font-family: var(--font-en);
+    overflow-x: hidden;
+  }
+
+  /* ── NOISE ── */
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    opacity: 0.03; pointer-events: none; z-index: 9999;
+  }
+
+  /* ── PROGRESS ── */
+  #progress {
+    position: fixed; top: 0; left: 0; height: 2px;
+    background: linear-gradient(90deg, var(--red-light), var(--gold-light));
+    z-index: 1000; transform-origin: left; transform: scaleX(0);
+  }
+
+  /* ── NAV ── */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    padding: 20px 48px;
+    display: flex; justify-content: space-between; align-items: center;
+    transition: background 0.4s, backdrop-filter 0.4s;
+  }
+  nav.scrolled { background: rgba(13,13,13,0.92); backdrop-filter: blur(12px); }
+  .nav-logo { display: flex; align-items: center; gap: 14px; text-decoration: none; }
+  .nav-logo-img {
+    width: 42px; height: 42px; object-fit: contain;
+    flex-shrink: 0;
+    filter: none;
+  }
+  .nav-logo-en {
+    font-family: 'Georgia', 'Times New Roman', serif;
+    font-size: clamp(15px, 1.4vw, 20px);
+    letter-spacing: 0.12em;
+    color: rgba(255,255,255,0.92);
+    font-weight: normal;
+    white-space: nowrap;
+  }
+  .nav-links { display: flex; gap: 28px; }
+  .nav-links a { font-size: 11px; letter-spacing: 0.25em; color: rgba(255,255,255,0.4); text-decoration: none; font-family: sans-serif; transition: color 0.2s; }
+  .nav-links a:hover { color: white; }
+
+  /* ── FLOATING PARTICLES ── */
+  #particles { position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
+  .particle { position: absolute; opacity: 0; animation: floatUp linear infinite; }
+  .particle img { width: 100%; height: 100%; object-fit: contain; }
+  @keyframes floatUp {
+    0%   { transform: translateY(110vh) rotate(0deg); opacity: 0; }
+    10%  { opacity: 0.12; }
+    90%  { opacity: 0.12; }
+    100% { transform: translateY(-20vh) rotate(360deg); opacity: 0; }
+  }
+
+  /* ── HERO ── */
+  #hero {
+    position: relative; height: 100vh;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    overflow: hidden; z-index: 1;
+  }
+  .hero-bg {
+    position: absolute; inset: 0;
+    background:
+      radial-gradient(ellipse 60% 60% at 30% 50%, rgba(122,28,28,0.5) 0%, transparent 70%),
+      radial-gradient(ellipse 60% 60% at 70% 50%, rgba(193,127,36,0.5) 0%, transparent 70%),
+      #0d0d0d;
+  }
+  /* ── HERO BRAND ── */
+  .hero-brand { position: relative; z-index: 3; text-align: center; }
+  .hero-brand .cn {
+    font-family: var(--font-cn-brush);
+    font-size: clamp(16px, 2.2vw, 26px);
+    letter-spacing: 0.35em; color: rgba(255,255,255,0.55); margin-bottom: 6px;
+  }
+  .hero-brand h1 {
+    font-size: clamp(44px, 7.5vw, 100px); font-style: italic; line-height: 0.9;
+    background: linear-gradient(135deg, #fff 30%, rgba(255,255,255,0.55));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  }
+  .hero-brand .sub { font-size: clamp(11px, 1.3vw, 15px); letter-spacing: 0.35em; color: rgba(255,255,255,0.35); margin-top: 14px; }
+
+  /* ── HERO COLLISION ── */
+  .hero-collision {
+    position: relative; z-index: 2;
+    display: flex; align-items: flex-end; justify-content: center;
+    gap: 0; margin-top: 20px;
+    width: clamp(340px, 60vw, 900px);
+  }
+  .hero-box {
+    width: clamp(140px, 20vw, 290px);
+    filter: drop-shadow(0 20px 60px rgba(0,0,0,0.85));
+    cursor: pointer; flex-shrink: 0;
+  }
+  .hero-box img { width: 100%; display: block; }
+  #heroBoxRed  { transform-origin: right bottom; }
+  #heroBoxGold { transform-origin: left bottom; }
+
+  /* shockwave ring */
+  #shockwave {
+    position: absolute; top: 50%; left: 50%;
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    border: 3px solid rgba(255,255,255,0.7);
+    transform: translate(-50%, -50%) scale(0);
+    opacity: 0; pointer-events: none; z-index: 4;
+  }
+  /* impact sparks */
+  .spark {
+    position: absolute; top: 50%; left: 50%;
+    width: 4px; height: 4px; border-radius: 50%;
+    transform: translate(-50%, -50%);
+    pointer-events: none; z-index: 4; opacity: 0;
+  }
+
+  .scroll-hint {
+    position: absolute; bottom: 32px; left: 50%; transform: translateX(-50%);
+    z-index: 2; display: flex; flex-direction: column; align-items: center; gap: 8px;
+    color: rgba(255,255,255,0.3); font-size: 10px; letter-spacing: 0.35em;
+    animation: bounce 2s ease-in-out infinite;
+  }
+  .scroll-hint::after { content: ''; width: 1px; height: 50px; background: linear-gradient(to bottom, rgba(255,255,255,0.35), transparent); }
+  @keyframes bounce {
+    0%, 100% { transform: translateX(-50%) translateY(0); }
+    50%       { transform: translateX(-50%) translateY(8px); }
+  }
+
+  /* ── GLOW ORBS ── */
+  .glow-orb { position: absolute; border-radius: 50%; filter: blur(80px); pointer-events: none; opacity: 0.25; }
+
+  /* ── SPLIT ── */
+  #split { position: relative; height: 100vh; overflow: hidden; z-index: 1; cursor: col-resize; }
+  .split-side {
+    position: absolute; inset: 0;
+  }
+  .split-inner {
+    position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+    display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 24px;
+    width: max-content; max-width: 80vw;
+  }
+  .split-red {
+    background: url('dark-bg.png') center/cover no-repeat;
+    clip-path: inset(0 50% 0 0); transition: clip-path 0.05s linear;
+    z-index: 2;
+  }
+  .split-red::before {
+    content: ''; position: absolute; inset: 0;
+    background: linear-gradient(135deg, rgba(61,10,10,0.75) 0%, rgba(122,28,28,0.65) 50%, rgba(61,10,10,0.75) 100%);
+    z-index: 0;
+  }
+  .split-gold {
+    background: url('light-bg.png') center/cover no-repeat;
+    z-index: 1;
+  }
+  .split-gold::before {
+    content: ''; position: absolute; inset: 0;
+    background: linear-gradient(135deg, rgba(61,36,0,0.90) 0%, rgba(193,127,36,0.85) 50%, rgba(61,36,0,0.90) 100%);
+    z-index: 0;
+  }
+  .split-inner > * { position: relative; z-index: 1; text-align: center; }
+
+  .split-product-img { width: clamp(180px, 20vw, 300px); filter: drop-shadow(0 20px 50px rgba(0,0,0,0.9)); animation: floatProd 4s ease-in-out infinite; }
+  .split-gold .split-product-img { animation-delay: -2s; }
+  @keyframes floatProd { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-16px); } }
+
+  .split-title-cn {
+    font-family: var(--font-cn-brush);
+    font-size: clamp(24px, 3.8vw, 52px);
+    letter-spacing: 0.12em; text-shadow: 0 2px 20px rgba(0,0,0,0.5);
+  }
+  .split-red .split-title-cn { color: #ffcfcf; }
+  .split-gold .split-title-cn { color: #ffe9b0; }
+  .split-title-en { font-size: clamp(11px, 1.3vw, 16px); letter-spacing: 0.2em; opacity: 0.5; font-style: italic; }
+
+  .split-divider { position: absolute; top: 0; bottom: 0; left: 50%; width: 3px; background: white; transform: translateX(-50%); z-index: 10; box-shadow: 0 0 20px rgba(255,255,255,0.6); }
+  .split-handle {
+    position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+    width: 52px; height: 52px; background: white; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 0 30px rgba(255,255,255,0.4); font-size: 18px; color: #333; user-select: none;
+  }
+  .split-label { position: absolute; top: 28px; font-size: 11px; letter-spacing: 0.3em; opacity: 0.45; pointer-events: none; }
+  .split-label.left { left: 32px; } .split-label.right { right: 32px; }
+
+  /* ── PRODUCT SECTIONS ── */
+  .product-section {
+    position: relative; min-height: 100vh;
+    display: flex; align-items: center; justify-content: center;
+    overflow: hidden; z-index: 1; padding: 100px 48px;
+  }
+  .product-section.red-world  { background: linear-gradient(160deg, #1a0505 0%, #4a0f0f 40%, #1a0505 100%); }
+  .product-section.gold-world { background: linear-gradient(160deg, #1a0e00 0%, #4a2c00 40%, #1a0e00 100%); }
+
+  .product-inner { display: flex; align-items: center; gap: clamp(40px, 7vw, 120px); max-width: 1100px; width: 100%; position: relative; z-index: 1; }
+  .product-section.gold-world .product-inner { flex-direction: row-reverse; }
+
+  /* explosion wrap */
+  .product-img-wrap { flex: 0 0 auto; width: clamp(220px, 28vw, 400px); position: relative; }
+  .product-img-wrap::before {
+    content: ''; position: absolute; inset: -20%; border-radius: 50%; opacity: 0.28; filter: blur(60px);
+  }
+  .red-world  .product-img-wrap::before { background: radial-gradient(var(--red-light), transparent 70%); }
+  .gold-world .product-img-wrap::before { background: radial-gradient(var(--gold-light), transparent 70%); }
+
+  .product-img-wrap > img { width: 100%; position: relative; z-index: 1; filter: drop-shadow(0 24px 60px rgba(0,0,0,0.9)); }
+
+  /* ── BOWL ASSEMBLY ── */
+  .bowl-stage { position: relative; width: 100%; aspect-ratio: 1536 / 1024; z-index: 1; }
+  .bowl-layer {
+    position: absolute; inset: 0; width: 100%; height: 100%;
+    object-fit: contain; will-change: transform, opacity; opacity: 0;
+  }
+  .bowl-layer[data-layer="base"] { filter: drop-shadow(0 24px 50px rgba(0,0,0,0.85)); }
+  .bowl-steam { mix-blend-mode: screen; }
+
+  /* ── BACKGROUND DECO FRAGMENTS ── */
+  .frag {
+    position: absolute;
+    opacity: 0; pointer-events: none; z-index: 0;
+  }
+  .frag img { width: 100%; height: 100%; object-fit: contain; }
+  .frag-noodle { width: clamp(240px, 28vw, 400px); height: clamp(240px, 28vw, 400px); }
+  .frag-spice  { width: clamp(60px,  7vw, 100px);  height: clamp(60px,  7vw, 100px); }
+  .frag-spoon  { width: clamp(70px,  8vw, 110px);  height: clamp(70px,  8vw, 110px); }
+
+  .product-info { flex: 1; }
+
+  .product-tag {
+    display: inline-block; font-size: 11px; letter-spacing: 0.4em;
+    padding: 5px 16px; border: 1px solid; border-radius: 100px;
+    margin-bottom: 18px; opacity: 0; font-family: sans-serif;
+  }
+  .red-world  .product-tag { border-color: var(--red-light); color: var(--red-light); }
+  .gold-world .product-tag { border-color: var(--gold-light); color: var(--gold-light); }
+
+  .product-cn {
+    font-family: var(--font-cn-brush);
+    font-size: clamp(36px, 5.5vw, 76px);
+    line-height: 1.15; margin-bottom: 10px; opacity: 0; transform: translateY(30px);
+    text-shadow: 0 2px 30px rgba(0,0,0,0.3);
+  }
+  .red-world  .product-cn { color: #ffe0e0; }
+  .gold-world .product-cn { color: #fff3d0; }
+
+  .product-en { font-size: clamp(13px, 1.8vw, 20px); font-style: italic; opacity: 0; margin-bottom: 24px; line-height: 1.5; color: rgba(255,255,255,0.7); }
+  .product-desc { font-size: clamp(13px, 1.2vw, 15px); line-height: 1.9; color: rgba(255,255,255,0.55); max-width: 420px; opacity: 0; margin-bottom: 32px; font-family: var(--font-cn-serif); }
+
+  .spicy-meter { display: flex; align-items: center; gap: 12px; opacity: 0; }
+  .spicy-label { font-size: 12px; letter-spacing: 0.2em; color: rgba(255,255,255,0.4); font-family: sans-serif; }
+  .chili-icons { display: flex; gap: 6px; }
+  .chili { font-size: 24px; transform: scale(0.5) rotate(-30deg); opacity: 0; transition: transform 0.3s ease, opacity 0.3s ease, filter 0.3s ease; }
+  .chili.lit { transform: scale(1) rotate(0deg); opacity: 1; filter: drop-shadow(0 0 6px rgba(255,80,0,0.8)); animation: chiliBounce 0.4s ease; }
+  @keyframes chiliBounce { 0% { transform: scale(1.4) rotate(10deg); } 100% { transform: scale(1) rotate(0deg); } }
+
+  .weight-badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    margin-top: 24px; padding: 10px 20px; border-radius: 8px;
+    font-family: sans-serif; font-size: 13px; opacity: 0;
+  }
+  .red-world  .weight-badge { background: rgba(122,28,28,0.4); border: 1px solid rgba(192,57,43,0.3); }
+  .gold-world .weight-badge { background: rgba(193,127,36,0.3); border: 1px solid rgba(232,160,48,0.3); }
+
+  /* ── CTA SECTION ── */
+  #cta {
+    position: relative; z-index: 1;
+    background: #0a0a0a;
+    padding: 120px 48px 100px;
+    text-align: center; overflow: hidden;
+  }
+  #cta .glow-orb-l { position: absolute; width: 600px; height: 600px; background: #7a1c1c; left: -150px; top: -100px; border-radius: 50%; filter: blur(100px); opacity: 0.2; pointer-events: none; }
+  #cta .glow-orb-r { position: absolute; width: 600px; height: 600px; background: #c17f24; right: -150px; top: -100px; border-radius: 50%; filter: blur(100px); opacity: 0.2; pointer-events: none; }
+
+  .cta-eyebrow { font-family: sans-serif; font-size: 11px; letter-spacing: 0.45em; color: rgba(255,255,255,0.35); margin-bottom: 20px; }
+  .cta-title {
+    font-family: var(--font-cn-brush);
+    font-size: clamp(36px, 6vw, 84px);
+    background: linear-gradient(135deg, #c0392b 0%, #e8a030 100%);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    margin-bottom: 16px; line-height: 1.1;
+  }
+  .cta-sub { font-size: clamp(13px, 1.4vw, 17px); color: rgba(255,255,255,0.4); letter-spacing: 0.15em; margin-bottom: 64px; font-style: italic; }
+
+  .cta-cards { display: flex; gap: 32px; justify-content: center; flex-wrap: wrap; margin-bottom: 72px; }
+  .cta-card {
+    position: relative; width: clamp(280px, 30vw, 380px);
+    border-radius: 20px; padding: 40px 32px 36px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    cursor: pointer; overflow: hidden;
+  }
+  .cta-card:hover { transform: translateY(-8px); }
+  .cta-card.red-card {
+    background: linear-gradient(145deg, #2a0808, #5a1212);
+    border: 1px solid rgba(192,57,43,0.25);
+    box-shadow: 0 20px 60px rgba(122,28,28,0.4);
+  }
+  .cta-card.red-card:hover { box-shadow: 0 30px 80px rgba(192,57,43,0.5); }
+  .cta-card.gold-card {
+    background: linear-gradient(145deg, #221200, #5a3200);
+    border: 1px solid rgba(232,160,48,0.25);
+    box-shadow: 0 20px 60px rgba(193,127,36,0.35);
+  }
+  .cta-card.gold-card:hover { box-shadow: 0 30px 80px rgba(232,160,48,0.45); }
+
+  .cta-card-img { width: 70%; margin: 0 auto 24px; display: block; filter: drop-shadow(0 16px 40px rgba(0,0,0,0.8)); transition: transform 0.4s ease; }
+  .cta-card:hover .cta-card-img { transform: scale(1.06) translateY(-4px); }
+
+  .cta-card-name {
+    font-family: var(--font-cn-brush);
+    font-size: clamp(20px, 2.5vw, 30px);
+    margin-bottom: 6px; letter-spacing: 0.08em;
+  }
+  .red-card  .cta-card-name { color: #ffcfcf; }
+  .gold-card .cta-card-name { color: #ffe9b0; }
+
+  .cta-card-en { font-size: 12px; font-style: italic; color: rgba(255,255,255,0.4); margin-bottom: 20px; line-height: 1.5; }
+  .cta-card-weight { font-size: 12px; font-family: sans-serif; color: rgba(255,255,255,0.3); margin-bottom: 28px; letter-spacing: 0.1em; }
+
+  .cta-btn {
+    display: block; width: 100%; padding: 14px 0;
+    border: none; border-radius: 100px; font-family: sans-serif;
+    font-size: 13px; letter-spacing: 0.25em; cursor: pointer;
+    transition: transform 0.2s, filter 0.2s;
+    position: relative; overflow: hidden;
+  }
+  .cta-btn::after { content: ''; position: absolute; inset: 0; background: white; opacity: 0; transition: opacity 0.2s; }
+  .cta-btn:hover::after { opacity: 0.08; }
+  .cta-btn:hover { transform: scale(1.02); filter: brightness(1.1); }
+  .cta-btn:active { transform: scale(0.98); }
+  .red-card  .cta-btn { background: linear-gradient(90deg, #7a1c1c, #c0392b); color: white; }
+  .gold-card .cta-btn { background: linear-gradient(90deg, #7a4a00, #e8a030); color: white; }
+
+  .cta-divider {
+    display: flex; align-items: center; gap: 24px;
+    color: rgba(255,255,255,0.15); font-size: 11px; letter-spacing: 0.3em;
+    max-width: 500px; margin: 0 auto 40px;
+  }
+  .cta-divider::before, .cta-divider::after { content: ''; flex: 1; height: 1px; background: rgba(255,255,255,0.1); }
+
+  .cta-trust { display: flex; gap: 40px; justify-content: center; flex-wrap: wrap; }
+  .trust-item { font-size: 12px; font-family: sans-serif; color: rgba(255,255,255,0.3); letter-spacing: 0.15em; }
+  .trust-item span { display: block; font-size: 20px; margin-bottom: 4px; }
+
+  /* ── REVEAL ── */
+  .reveal { opacity: 0; transform: translateY(40px); }
+</style>
+</head>
+<body>
+
+<div id="progress"></div>
+<div id="particles"></div>
+
+<nav id="nav">
+  <a class="nav-logo" href="#hero">
+    <img class="nav-logo-img" src="logo.webp" alt="漢典食品 logo">
+    <span class="nav-logo-en">HAN DIAN (UK)</span>
+  </a>
+  <div class="nav-links">
+    <a href="#hero">首頁</a>
+    <a href="#split">比較</a>
+    <a href="#red">香辣雞</a>
+    <a href="#gold">酸菜牛</a>
+    <a href="#cta">購買</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-bg"></div>
+  <div class="glow-orb" style="width:500px;height:500px;background:#7a1c1c;left:-10%;top:10%;"></div>
+  <div class="glow-orb" style="width:500px;height:500px;background:#c17f24;right:-10%;top:10%;"></div>
+  <div class="hero-brand" id="heroBrand">
+    <div class="cn">漢典食品</div>
+    <h1>BiangBiang<br>Noodle</h1>
+    <div class="sub">AUTHENTIC · BOLD · UNFORGETTABLE</div>
+  </div>
+
+  <div class="hero-collision" id="heroCollision">
+    <img class="hero-box" id="heroBoxRed"  src="chicken-cutout.png"      alt="香辣雞寬帶麵">
+    <img class="hero-box" id="heroBoxGold" src="beef-cutout-reverse.png"  alt="酸菜麻辣牛肉寬帶麵">
+    <div id="shockwave"></div>
+  </div>
+
+  <div class="scroll-hint">SCROLL</div>
+</section>
+
+<!-- SPLIT -->
+<section id="split">
+  <div class="split-side split-gold">
+    <div class="split-inner">
+      <img class="split-product-img" src="beef-cutout.png" alt="">
+      <div class="split-title-cn">酸菜麻辣牛肉寬帶麵</div>
+      <div class="split-title-en">Spicy Beef · Pickled Mustard</div>
+    </div>
+  </div>
+  <div class="split-side split-red">
+    <div class="split-inner">
+      <img class="split-product-img" src="chicken-cutout.png" alt="">
+      <div class="split-title-cn">香辣雞寬帶麵</div>
+      <div class="split-title-en">Spicy Minced Chicken Sauce</div>
+    </div>
+  </div>
+  <div class="split-divider" id="splitDivider">
+    <div class="split-handle">↔</div>
+  </div>
+  <div class="split-label left">拖動</div>
+  <div class="split-label right">DRAG</div>
+</section>
+
+<!-- PRODUCT 1: RED -->
+<section class="product-section red-world" id="red">
+  <div class="glow-orb" style="width:600px;height:600px;background:#7a1c1c;right:-200px;top:-100px;opacity:0.3;"></div>
+  <!-- background deco elements -->
+  <div class="frag frag-noodle" id="rf1" style="top:8%;left:-2%;transform:rotate(-25deg)"><img src="noodle.svg"></div>
+  <div class="frag frag-noodle" id="rf2" style="bottom:5%;right:-3%;transform:rotate(15deg)"><img src="noodle2.svg"></div>
+  <div class="frag frag-spice"  id="rf3" style="top:12%;right:6%;transform:rotate(30deg);width:clamp(75px,9vw,120px);height:clamp(75px,9vw,120px)"><img src="spice.svg"></div>
+  <div class="frag frag-spice"  id="rf4" style="bottom:10%;left:3%;transform:rotate(-40deg);width:clamp(50px,5.5vw,80px);height:clamp(50px,5.5vw,80px)"><img src="spice.svg"></div>
+  <div class="frag frag-spice"  id="rf5" style="top:55%;left:1%;transform:rotate(10deg);width:clamp(65px,7.5vw,105px);height:clamp(65px,7.5vw,105px)"><img src="spice.svg"></div>
+  <div class="frag frag-spice"  id="rf7" style="bottom:20%;right:8%;transform:rotate(-55deg);width:clamp(55px,6vw,88px);height:clamp(55px,6vw,88px)"><img src="spice.svg"></div>
+  <div class="frag frag-noodle" id="rf6" style="top:2%;right:20%;transform:rotate(-10deg)"><img src="noodle.svg"></div>
+  <div class="product-inner">
+    <div class="product-img-wrap" id="redWrap">
+      <img src="chicken-cutout.png" alt="香辣雞寬帶麵" id="redImg">
+    </div>
+    <div class="product-info">
+      <div class="product-tag reveal">限定口味</div>
+      <div class="product-cn reveal">香辣雞<br>寬帶麵</div>
+      <div class="product-en reveal">BiangBiang Noodle with<br>Spicy Minced Chicken Sauce</div>
+      <div class="product-desc reveal">
+        以秘製香辣雞肉醬為靈魂，搭配加寬版寬帶麵，口感 Q 彈有嚼勁。
+        香料與雞肉的層次在每一口中展開，帶來令人難以抗拒的辛香餘韻。
+      </div>
+      <div class="spicy-meter reveal">
+        <span class="spicy-label">辣度</span>
+        <div class="chili-icons" id="redChilis">
+          <span class="chili">🌶️</span>
+          <span class="chili">🌶️</span>
+          <span class="chili">🌶️</span>
+        </div>
+      </div>
+      <div class="weight-badge reveal">📦 &nbsp; 350g &nbsp;·&nbsp; 1人份 &nbsp;·&nbsp; 冷凍保存 -18°C</div>
+    </div>
+  </div>
+</section>
+
+<!-- PRODUCT 2: GOLD -->
+<section class="product-section gold-world" id="gold">
+  <div class="glow-orb" style="width:600px;height:600px;background:#c17f24;left:-200px;top:-100px;opacity:0.3;"></div>
+  <!-- background deco elements -->
+  <div class="frag frag-noodle" id="gf1" style="top:5%;right:-2%;transform:rotate(20deg)"><img src="noodle2.svg"></div>
+  <div class="frag frag-noodle" id="gf2" style="bottom:6%;left:-2%;transform:rotate(-18deg)"><img src="noodle.svg"></div>
+  <div class="frag frag-spice"  id="gf3" style="top:5%;left:1%;transform:rotate(-35deg);width:clamp(55px,6vw,88px);height:clamp(55px,6vw,88px)"><img src="spice.svg"></div>
+  <div class="frag frag-spoon"  id="gf4" style="bottom:12%;right:4%;transform:rotate(45deg)"><img src="spoon.svg"></div>
+  <div class="frag frag-spice"  id="gf5" style="top:40%;right:3%;transform:rotate(-15deg);width:clamp(75px,9vw,120px);height:clamp(75px,9vw,120px)"><img src="spice.svg"></div>
+  <div class="frag frag-spice"  id="gf7" style="bottom:8%;left:2%;transform:rotate(60deg);width:clamp(62px,7vw,100px);height:clamp(62px,7vw,100px)"><img src="spice.svg"></div>
+  <div class="frag frag-spice"  id="gf8" style="top:8%;right:5%;transform:rotate(-70deg);width:clamp(52px,5.5vw,82px);height:clamp(52px,5.5vw,82px)"><img src="spice.svg"></div>
+  <div class="frag frag-noodle" id="gf6" style="top:3%;left:22%;transform:rotate(8deg)"><img src="noodle2.svg"></div>
+  <div class="product-inner">
+    <div class="product-img-wrap" id="goldWrap">
+      <img src="beef-cutout-reverse.png" alt="酸菜麻辣牛肉寬帶麵" id="goldImg">
+    </div>
+    <div class="product-info">
+      <div class="product-tag reveal">明星商品</div>
+      <div class="product-cn reveal">酸菜麻辣<br>牛肉寬帶麵</div>
+      <div class="product-en reveal">Spicy Beef BiangBiang Noodle Soup<br>with Pickled Mustard</div>
+      <div class="product-desc reveal">
+        醇厚牛骨湯底結合酸菜的酸爽，麻辣香料層層疊加，
+        每一口都飽滿入味。湯汁濃郁，寬帶麵飽吸精華，份量十足。
+      </div>
+      <div class="spicy-meter reveal">
+        <span class="spicy-label">辣度</span>
+        <div class="chili-icons" id="goldChilis">
+          <span class="chili">🌶️</span>
+          <span class="chili">🌶️</span>
+          <span class="chili">🌶️</span>
+          <span class="chili">🌶️</span>
+        </div>
+      </div>
+      <div class="weight-badge reveal">📦 &nbsp; 598g &nbsp;·&nbsp; 1–2人份 &nbsp;·&nbsp; 冷凍保存 -18°C</div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section id="cta">
+  <div class="glow-orb-l"></div>
+  <div class="glow-orb-r"></div>
+
+  <div class="cta-eyebrow reveal">— 立即選購 —</div>
+  <div class="cta-title reveal">選你的麵，定你的辣</div>
+  <div class="cta-sub reveal">Two flavours. One craving.</div>
+
+  <div class="cta-cards">
+    <div class="cta-card red-card reveal">
+      <img class="cta-card-img" src="chicken-cutout.png" alt="香辣雞寬帶麵">
+      <div class="cta-card-name">香辣雞寬帶麵</div>
+      <div class="cta-card-en">BiangBiang Noodle with<br>Spicy Minced Chicken Sauce</div>
+      <div class="cta-card-weight">350g · 1人份 · 冷凍 -18°C</div>
+      <button class="cta-btn">立即購買</button>
+    </div>
+    <div class="cta-card gold-card reveal">
+      <img class="cta-card-img" src="beef-cutout.png" alt="酸菜麻辣牛肉寬帶麵">
+      <div class="cta-card-name">酸菜麻辣牛肉寬帶麵</div>
+      <div class="cta-card-en">Spicy Beef BiangBiang Noodle Soup<br>with Pickled Mustard</div>
+      <div class="cta-card-weight">598g · 1–2人份 · 冷凍 -18°C</div>
+      <button class="cta-btn">立即購買</button>
+    </div>
+  </div>
+
+  <div class="cta-divider reveal">正宗道地 · 英國製造</div>
+  <div class="cta-trust reveal">
+    <div class="trust-item"><span>🇬🇧</span>Made in UK</div>
+    <div class="trust-item"><span>❄️</span>冷凍配送</div>
+    <div class="trust-item"><span>🌶️</span>真材實料</div>
+    <div class="trust-item"><span>🍜</span>加寬麵條</div>
+  </div>
+</section>
+
+<script>
+gsap.registerPlugin(ScrollTrigger);
+
+// ── PROGRESS ──
+const progressBar = document.getElementById('progress');
+window.addEventListener('scroll', () => {
+  gsap.set(progressBar, { scaleX: window.scrollY / (document.body.scrollHeight - window.innerHeight) });
+});
+
+// ── NAV ──
+const nav = document.getElementById('nav');
+window.addEventListener('scroll', () => nav.classList.toggle('scrolled', window.scrollY > 80));
+
+// ── HERO COLLISION INTRO ──
+const heroTl = gsap.timeline({ defaults: { ease: 'power3.out' } });
+
+// brand fades in first
+heroTl
+  .from('#heroBrand .cn',  { opacity: 0, y: 16, duration: 0.5 })
+  .from('#heroBrand h1',   { opacity: 0, y: 36, duration: 0.7 }, '-=0.2')
+  .from('#heroBrand .sub', { opacity: 0, duration: 0.5 }, '-=0.3')
+
+  // boxes slide in from far sides, slightly off-screen
+  .from('#heroBoxRed',  { x: '-120vw', rotation: -12, opacity: 0, duration: 1.0, ease: 'power2.in' }, '-=0.1')
+  .from('#heroBoxGold', { x:  '120vw', rotation:  12, opacity: 0, duration: 1.0, ease: 'power2.in' }, '<')
+
+  // COLLISION: boxes lurch together, slight bounce back
+  .to('#heroBoxRed',  { x: 28,  rotation:  4, duration: 0.18, ease: 'power4.out' })
+  .to('#heroBoxGold', { x: -28, rotation: -4, duration: 0.18, ease: 'power4.out' }, '<')
+
+  // shockwave ring expands
+  .to('#shockwave', { scale: 60, opacity: 0, duration: 0.6, ease: 'power2.out' }, '<0.02')
+
+  // sparks burst out
+  .call(() => {
+    const colors = ['#fff','#ff6b35','#ffd700','#ff3333','#ffaa00'];
+    for (let i = 0; i < 18; i++) {
+      const spark = document.createElement('div');
+      spark.className = 'spark';
+      const angle = (i / 18) * Math.PI * 2;
+      const dist  = 60 + Math.random() * 120;
+      spark.style.background = colors[i % colors.length];
+      document.getElementById('heroCollision').appendChild(spark);
+      gsap.to(spark, {
+        x: Math.cos(angle) * dist, y: Math.sin(angle) * dist - 40,
+        opacity: 1, scale: 1 + Math.random() * 3,
+        duration: 0.12, ease: 'power2.out',
+        onComplete: () => gsap.to(spark, { opacity: 0, y: `+=${60}`, duration: 0.4 + Math.random() * 0.3 })
+      });
+    }
+  }, [], '<')
+
+  // settle back with slight bounce
+  .to('#heroBoxRed',  { x: 0, rotation: 0, duration: 0.5, ease: 'elastic.out(1, 0.5)' }, '+=0.1')
+  .to('#heroBoxGold', { x: 0, rotation: 0, duration: 0.5, ease: 'elastic.out(1, 0.5)' }, '<')
+
+  // gentle float loop after settle
+  .call(() => {
+    gsap.to('#heroBoxRed',  { y: -10, duration: 2.2, ease: 'sine.inOut', yoyo: true, repeat: -1 });
+    gsap.to('#heroBoxGold', { y: -14, duration: 2.6, ease: 'sine.inOut', yoyo: true, repeat: -1, delay: 0.6 });
+  });
+
+// hover glow
+document.getElementById('heroBoxRed').addEventListener('mouseenter', () =>
+  gsap.to('#heroBoxRed', { filter: 'drop-shadow(0 20px 60px rgba(192,57,43,0.8))', duration: 0.3 }));
+document.getElementById('heroBoxRed').addEventListener('mouseleave', () =>
+  gsap.to('#heroBoxRed', { filter: 'drop-shadow(0 20px 60px rgba(0,0,0,0.85))', duration: 0.3 }));
+document.getElementById('heroBoxGold').addEventListener('mouseenter', () =>
+  gsap.to('#heroBoxGold', { filter: 'drop-shadow(0 20px 60px rgba(232,160,48,0.8))', duration: 0.3 }));
+document.getElementById('heroBoxGold').addEventListener('mouseleave', () =>
+  gsap.to('#heroBoxGold', { filter: 'drop-shadow(0 20px 60px rgba(0,0,0,0.85))', duration: 0.3 }));
+
+// ── HERO PARALLAX ──
+document.getElementById('hero').addEventListener('mousemove', e => {
+  const dx = (e.clientX - window.innerWidth / 2) / (window.innerWidth / 2);
+  const dy = (e.clientY - window.innerHeight / 2) / (window.innerHeight / 2);
+  gsap.to('#heroBoxRed',  { x: dx * -18, y: dy * -10, duration: 0.5, ease: 'power2.out' });
+  gsap.to('#heroBoxGold', { x: dx *  18, y: dy * -10, duration: 0.5, ease: 'power2.out' });
+  gsap.to('#heroBrand',   { x: dx * -8,  y: dy *  -4, duration: 0.6, ease: 'power2.out' });
+});
+
+// ── HERO SCROLL PARALLAX ──
+gsap.to('#heroCollision', { yPercent: 14, scrollTrigger: { trigger: '#hero', start: 'top top', end: 'bottom top', scrub: true } });
+gsap.to('#heroBrand', { yPercent: -20, opacity: 0, scrollTrigger: { trigger: '#hero', start: '40% top', end: 'bottom top', scrub: true } });
+
+// ── SPLIT DRAG ──
+const splitDivider = document.getElementById('splitDivider');
+const splitRed = document.querySelector('.split-red');
+let dragging = false;
+const setSplit = pct => {
+  pct = Math.max(10, Math.min(90, pct));
+  splitDivider.style.left = pct + '%';
+  splitRed.style.clipPath = `inset(0 ${100-pct}% 0 0)`;
+};
+document.getElementById('split').addEventListener('mousedown', () => dragging = true);
+window.addEventListener('mouseup', () => dragging = false);
+window.addEventListener('mousemove', e => {
+  if (!dragging) return;
+  const r = document.getElementById('split').getBoundingClientRect();
+  setSplit(((e.clientX - r.left) / r.width) * 100);
+});
+document.getElementById('split').addEventListener('touchmove', e => {
+  const r = document.getElementById('split').getBoundingClientRect();
+  setSplit(((e.touches[0].clientX - r.left) / r.width) * 100);
+}, { passive: true });
+setSplit(50);
+
+// ── REVEAL ON SCROLL ──
+document.querySelectorAll('.reveal').forEach((el, i) => {
+  gsap.fromTo(el,
+    { opacity: 0, y: 45 },
+    { opacity: 1, y: 0, duration: 0.85, ease: 'power3.out',
+      scrollTrigger: { trigger: el, start: 'top 88%', toggleActions: 'play none none none' },
+      delay: el.closest('.cta-cards') ? i * 0.08 : 0
+    }
+  );
+});
+
+// ── 3D TILT ──
+['redImg', 'goldImg'].forEach(id => {
+  const el = document.getElementById(id);
+  if (!el) return;
+  const sec = el.closest('.product-section');
+  sec.addEventListener('mousemove', e => {
+    const r = sec.getBoundingClientRect();
+    gsap.to(el, { rotateX: ((e.clientY - r.top - r.height/2) / (r.height/2)) * -7, rotateY: ((e.clientX - r.left - r.width/2) / (r.width/2)) * 7, duration: 0.4, ease: 'power2.out', transformPerspective: 800 });
+  });
+  sec.addEventListener('mouseleave', () => gsap.to(el, { rotateX: 0, rotateY: 0, duration: 0.7, ease: 'elastic.out(1, 0.5)' }));
+});
+
+// ── BOWL ASSEMBLY ──
+function buildBowl(stageId) {
+  const stage = document.getElementById(stageId);
+  if (!stage) return;
+  const L = sel => stage.querySelector(`[data-layer="${sel}"]`);
+  const base = L('base'), noodle = L('noodle'), chicken = L('chicken'),
+        pepper = L('pepper'), onion = L('onion'), steam = L('steam');
+
+  gsap.set([base, noodle, chicken, pepper, onion, steam], { opacity: 0 });
+
+  const tl = gsap.timeline({
+    scrollTrigger: { trigger: stage, start: 'top 75%' }
+  });
+  tl.fromTo(base,    { opacity: 0, scale: 0.85, y: 30 },
+                     { opacity: 1, scale: 1, y: 0, duration: 0.6, ease: 'back.out(1.5)' })
+    .fromTo(noodle,  { opacity: 0, y: -90, scale: 1.1 },
+                     { opacity: 1, y: 0, scale: 1, duration: 0.5, ease: 'power3.out' }, '-=0.1')
+    .fromTo(chicken, { opacity: 0, y: -120, scale: 1.15 },
+                     { opacity: 1, y: 0, scale: 1, duration: 0.5, ease: 'power3.out' }, '-=0.2')
+    .fromTo(pepper,  { opacity: 0, y: -80, scale: 1.3, rotate: -15 },
+                     { opacity: 1, y: 0, scale: 1, rotate: 0, duration: 0.45, ease: 'power2.out' }, '-=0.25')
+    .fromTo(onion,   { opacity: 0, y: -80, scale: 1.3, rotate: 12 },
+                     { opacity: 1, y: 0, scale: 1, rotate: 0, duration: 0.45, ease: 'power2.out' }, '-=0.3')
+    .fromTo(steam,   { opacity: 0, y: 30, scale: 0.8 },
+                     { opacity: 0.75, y: 0, scale: 1, duration: 0.8, ease: 'power1.out' }, '-=0.1');
+
+  // gentle continuous loops once assembled
+  tl.add(() => {
+    gsap.to(base.parentNode, { y: -10, duration: 3.5, ease: 'sine.inOut', yoyo: true, repeat: -1 });
+    gsap.to(steam, { y: -22, opacity: 0.45, duration: 2.8, ease: 'sine.inOut', yoyo: true, repeat: -1 });
+  });
+}
+// buildBowl('redBowl');  // 碗組裝動畫（暫停，保留供之後啟用）
+
+// ── CHILIS ──
+['redChilis', 'goldChilis'].forEach(id => {
+  const chilis = document.querySelectorAll(`#${id} .chili`);
+  ScrollTrigger.create({ trigger: `#${id}`, start: 'top 90%', onEnter: () => {
+    chilis.forEach((c, i) => setTimeout(() => c.classList.add('lit'), i * 220));
+  }});
+});
+
+// ── BACKGROUND DECO REVEAL ──
+const revealFrags = (sectionId, fragIds) => {
+  ScrollTrigger.create({
+    trigger: '#' + sectionId,
+    start: 'top 70%',
+    onEnter: () => {
+      fragIds.forEach((id, i) => {
+        const el = document.getElementById(id);
+        gsap.fromTo(el,
+          { opacity: 0, scale: 0.6 },
+          {
+            opacity: 0.18,
+            scale: 1,
+            duration: 1.2,
+            ease: 'power2.out',
+            delay: i * 0.1,
+            onComplete: () => {
+              // gentle drift loop
+              gsap.to(el, {
+                y: `+=${10 + i * 3}`,
+                rotation: `+=${8 - i * 2}`,
+                duration: 3 + i * 0.4,
+                ease: 'sine.inOut',
+                yoyo: true,
+                repeat: -1
+              });
+            }
+          }
+        );
+      });
+    }
+  });
+};
+revealFrags('red',  ['rf1','rf2','rf3','rf4','rf5','rf6','rf7']);
+revealFrags('gold', ['gf1','gf2','gf3','gf4','gf5','gf6','gf7','gf8']);
+
+// ── FLOATING PARTICLES ──
+const particleContainer = document.getElementById('particles');
+const svgs = ['noodle.svg','noodle2.svg','spice.svg','spoon.svg'];
+for (let i = 0; i < 20; i++) {
+  const div = document.createElement('div');
+  div.className = 'particle';
+  const size = 18 + Math.random() * 46;
+  div.style.cssText = `width:${size}px;height:${size}px;left:${Math.random()*100}%;animation-duration:${9+Math.random()*18}s;animation-delay:${-Math.random()*22}s;`;
+  const img = document.createElement('img');
+  img.src = svgs[Math.floor(Math.random() * svgs.length)];
+  img.style.filter = 'brightness(0.7)';
+  div.appendChild(img);
+  particleContainer.appendChild(div);
+}
+</script>
+</body>
+</html>

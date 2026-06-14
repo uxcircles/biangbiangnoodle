@@ -1,0 +1,8 @@
+# macOS
+.DS_Store
+
+# Large source video masters (compressed .mp4 versions are committed instead)
+*.mov
+
+# Editor / preview server config
+.claude/
