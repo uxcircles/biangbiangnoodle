@@ -3,19 +3,19 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>漢典食品 HAN DIAN (UK) · 香辣雞 / 酸菜麻辣牛肉 BiangBiang 寬帶麵</title>
+<title>寬麵堂 KUAN (UK) · 香辣雞 / 酸菜麻辣牛肉 BiangBiang 寬帶麵</title>
 
 <!-- SEO -->
-<meta name="description" content="漢典食品 HAN DIAN (UK)：英國製造的正宗陝西 BiangBiang 加寬寬帶麵。香辣雞寬帶麵與酸菜麻辣牛肉寬帶麵，冷凍配送、真材實料，在家輕鬆享受道地手感麵。">
-<meta name="keywords" content="漢典食品, HAN DIAN, BiangBiang, 寬帶麵, 香辣雞, 酸菜麻辣牛肉, 冷凍麵, Made in UK, 陝西麵, biang biang noodle">
+<meta name="description" content="寬麵堂 KUAN (UK)：英國製造的正宗陝西 BiangBiang 加寬寬帶麵。香辣雞寬帶麵與酸菜麻辣牛肉寬帶麵，冷凍配送、真材實料，在家輕鬆享受道地手感麵。">
+<meta name="keywords" content="寬麵堂, KUAN, BiangBiang, 寬帶麵, 香辣雞, 酸菜麻辣牛肉, 冷凍麵, Made in UK, 陝西麵, biang biang noodle">
 <meta name="author" content="UX CIRCLES">
 <meta name="robots" content="index, follow">
 <meta name="theme-color" content="#1a0505">
 
 <!-- Open Graph -->
 <meta property="og:type" content="website">
-<meta property="og:site_name" content="漢典食品 HAN DIAN (UK)">
-<meta property="og:title" content="漢典食品 HAN DIAN (UK) · BiangBiang 寬帶麵">
+<meta property="og:site_name" content="寬麵堂 KUAN (UK)">
+<meta property="og:title" content="寬麵堂 KUAN (UK) · BiangBiang 寬帶麵">
 <meta property="og:description" content="英國製造的正宗陝西 BiangBiang 加寬寬帶麵 — 香辣雞 & 酸菜麻辣牛肉，冷凍配送、真材實料。">
 <meta property="og:image" content="og-image.png">
 <meta property="og:image:width" content="1200">
@@ -24,7 +24,7 @@
 
 <!-- Twitter -->
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="漢典食品 HAN DIAN (UK) · BiangBiang 寬帶麵">
+<meta name="twitter:title" content="寬麵堂 KUAN (UK) · BiangBiang 寬帶麵">
 <meta name="twitter:description" content="英國製造的正宗陝西 BiangBiang 加寬寬帶麵 — 香辣雞 & 酸菜麻辣牛肉。">
 <meta name="twitter:image" content="og-image.png">
 
@@ -84,17 +84,20 @@
     transition: background 0.4s, backdrop-filter 0.4s;
   }
   nav.scrolled { background: rgba(13,13,13,0.92); backdrop-filter: blur(12px); }
-  .nav-logo { display: flex; align-items: center; gap: 14px; text-decoration: none; }
-  .nav-logo-img {
-    width: 42px; height: 42px; object-fit: contain;
-    flex-shrink: 0;
-    filter: none;
+  .nav-logo { display: flex; align-items: center; gap: 12px; text-decoration: none; }
+  .nav-logo-icon { width: 40px; height: 40px; object-fit: contain; flex-shrink: 0; }
+  .nav-logo-cn {
+    font-family: var(--font-cn-brush);
+    font-size: clamp(22px, 2.2vw, 30px);
+    letter-spacing: 0.08em;
+    color: #fff;
+    line-height: 1;
   }
   .nav-logo-en {
     font-family: 'Georgia', 'Times New Roman', serif;
-    font-size: clamp(15px, 1.4vw, 20px);
-    letter-spacing: 0.12em;
-    color: rgba(255,255,255,0.92);
+    font-size: clamp(13px, 1.3vw, 17px);
+    letter-spacing: 0.22em;
+    color: rgba(255,255,255,0.55);
     font-weight: normal;
     white-space: nowrap;
   }
@@ -390,6 +393,8 @@
   .cta-btn:hover::after { opacity: 0.08; }
   .cta-btn:hover { transform: scale(1.02); filter: brightness(1.1); }
   .cta-btn:active { transform: scale(0.98); }
+  .cta-btn[disabled] { cursor: default; opacity: 0.75; }
+  .cta-btn[disabled]:hover { transform: none; filter: none; }
   .red-card  .cta-btn { background: linear-gradient(90deg, #7a1c1c, #c0392b); color: white; }
   .gold-card .cta-btn { background: linear-gradient(90deg, #7a4a00, #e8a030); color: white; }
 
@@ -459,8 +464,9 @@
 
 <nav id="nav">
   <a class="nav-logo" href="#hero">
-    <img class="nav-logo-img" src="logo.webp" alt="漢典食品 logo">
-    <span class="nav-logo-en">HAN DIAN (UK)</span>
+    <img class="nav-logo-icon" src="logo-icon.png" alt="寬麵堂 KUAN logo">
+    <span class="nav-logo-cn">寬麵堂</span>
+    <span class="nav-logo-en">KUAN (UK)</span>
   </a>
   <div class="nav-links">
     <a href="#hero">首頁</a>
@@ -477,7 +483,7 @@
   <div class="glow-orb" style="width:500px;height:500px;background:#7a1c1c;left:-10%;top:10%;"></div>
   <div class="glow-orb" style="width:500px;height:500px;background:#c17f24;right:-10%;top:10%;"></div>
   <div class="hero-brand" id="heroBrand">
-    <div class="cn">漢典食品</div>
+    <div class="cn">寬麵堂</div>
     <h1>BiangBiang<br>Noodle</h1>
     <div class="sub">AUTHENTIC · BOLD · UNFORGETTABLE</div>
   </div>
@@ -619,14 +625,14 @@
       <div class="cta-card-name">香辣雞寬帶麵</div>
       <div class="cta-card-en">BiangBiang Noodle with<br>Spicy Minced Chicken Sauce</div>
       <div class="cta-card-weight">350g · 1人份 · 冷凍 -18°C</div>
-      <a class="cta-btn" href="https://retour.uk/products/%E6%96%B0%E5%93%81-%E6%BC%A2%E5%85%B8-%E9%A6%99%E8%BE%A3%E9%9B%9E%E5%AF%AC%E5%B8%B6%E9%BA%B5-350g-han-dian-biang-biang-noodle-with-spicy-minced-chicken-sauce" target="_blank" rel="noopener noreferrer">立即購買</a>
+      <button class="cta-btn" type="button" disabled>概念展示 · DEMO</button>
     </div>
     <div class="cta-card gold-card reveal">
       <img class="cta-card-img" src="beef-cutout.png" alt="酸菜麻辣牛肉寬帶麵">
       <div class="cta-card-name">酸菜麻辣牛肉寬帶麵</div>
       <div class="cta-card-en">Spicy Beef BiangBiang Noodle Soup<br>with Pickled Mustard</div>
       <div class="cta-card-weight">598g · 1–2人份 · 冷凍 -18°C</div>
-      <a class="cta-btn" href="https://oolios.com/products/spicy-beef-biang-biang-noodle-soup-with-pickled-mustard" target="_blank" rel="noopener noreferrer">立即購買</a>
+      <button class="cta-btn" type="button" disabled>概念展示 · DEMO</button>
     </div>
   </div>
 
@@ -640,12 +646,12 @@
 </section>
 
 <footer class="site-footer">
-  <div class="footer-brand">漢典食品 · HAN DIAN (UK)</div>
+  <div class="footer-brand">寬麵堂 · KUAN (UK)</div>
   <div class="footer-credit">
     Crafted by
     <a href="https://ux-circles.com" target="_blank" rel="noopener noreferrer">UX&nbsp;CIRCLES</a>
   </div>
-  <div class="footer-copy">© 2026 HAN DIAN (UK). All rights reserved.</div>
+  <div class="footer-copy">© 2026 KUAN (UK). 概念設計作品 · Design concept demo.</div>
 </footer>
 
 <script>
